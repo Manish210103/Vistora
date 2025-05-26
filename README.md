@@ -6,7 +6,8 @@
 
 ## 🧩 Project Structure
 
-vistora/
+## vistora/
+
 ├── frontend/ # React app for UI
 
 ├── server/ # Express.js backend for API & auth
