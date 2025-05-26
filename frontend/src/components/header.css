@@ -1,0 +1,17 @@
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #1c1c1c;
+    padding: 5px 20px;
+    text-align: center;
+    font-weight: bold;
+    color: #fff;
+    font-size: 3rem;
+    
+}
+
+.color-primary {
+    color: var(--color-primary);
+    font-size: 3rem;
+}

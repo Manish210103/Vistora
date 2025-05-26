@@ -1,0 +1,60 @@
+/* src/index.css */
+
+:root {
+  --color-bg: #121212;
+  --color-surface: #1f1f1f;
+  --color-border: #444;
+
+  --color-primary: #a62fde;
+  /* Strong violet */
+  --color-primary-light: #c77dff;
+  --color-primary-dark: #7209b7;
+
+  --color-secondary: #b5179e;
+  /* Pink-violet */
+  --color-accent: #f72585;
+
+  --color-text: #ffffff;
+  --color-muted: #cccccc;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+}
+
+input,
+button {
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: none;
+  width: 100%;
+}
+
+input {
+  background-color: #1f1f2e;
+  color: white;
+}
+
+button {
+  background-color: #5a189a;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #7b2cbf;
+}
+
+.container {
+  max-width: 400px;
+  margin: 100px auto;
+  background-color: #1a1a2e;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}

@@ -1,0 +1,138 @@
+
+
+.upload-page {
+    display: flex;
+    height: 100%;
+    padding: 10px;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    gap: 20px;
+}
+
+.center-panel {
+    flex: 1.5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.right-panel {
+    flex: 1;
+    background-color: #1c1c1c;
+    border-radius: 10px;
+    padding: 0 20px 20px 20px;
+    color: var(--text-color);
+}
+
+.upload-title {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #fff;
+}
+
+.upload-box {
+    width: 580px;
+    height: 430px;
+    border: 2px dashed #fff;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    color: #fff;
+    position: relative;
+}
+
+.upload-box input[type="file"] {
+    display: none;
+}
+
+.upload-icon {
+    width: 50px;
+    height: 50px;
+    color: #fff;
+}
+
+.upload-text {
+    margin-top: 10px;
+    font-size: 16px;
+}
+
+.preview-container {
+    position: relative;
+    width: 580px;
+    height: 450px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.video-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 10px;
+    background-color: black;
+}
+
+.remove-button {
+    position: absolute;
+    top: 20px;
+    right: 5px;
+    background: var(--color-primary);
+    border: 2px solid white;
+    border-radius: 50%;
+    padding: 4px;
+    cursor: pointer;
+    color: white;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 8px rgba(166, 47, 222, 0.8);
+    transition: background-color 0.3s ease;
+    z-index: 100;
+}
+
+.upload-button {
+    width: 600px;
+    margin-top: 60px;
+    background-color: var(--color-primary);
+    color: white;
+    padding: 10px 25px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+.upload-button:hover:enabled {
+    background-color: #fff;
+}
+
+.loader {
+    width: 580px;
+    height: 450px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    border: 2px dashed #fff;
+    border-radius: 12px;
+    font-size: 18px;
+}
+
+.summary-title {
+    font-size: 2rem;
+    margin: 10px 0 15px 0;
+    color: #fff;
+}
+
+.summary-placeholder {
+    background-color: #121212;
+    padding: 15px;
+    border-radius: 8px;
+    color: #ccc;
+    min-height: 100px; }

@@ -1,0 +1,34 @@
+.layout {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+header {
+    height: 60px;
+    background-color: var(--primary-color);
+    padding: 0 20px;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 10;
+}
+
+footer {
+    height: 60px;
+    background-color: var(--secondary-color);
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    z-index: 10;
+}
+
+.main-content {
+    flex: 1;
+    margin-top: 80px;
+    margin-bottom: 100px;
+    height: calc(100vh - 150px);
+    overflow-y:hidden;
+    padding: 20px; 
+}
