@@ -36,9 +36,15 @@ exports.login = async (req, res) => {
     if (!isMatch) return res.status(400).json({ error: "Invalid credentials" });
 
     const token = createToken(user._id);
-    res.status(200).json({ token });
+
+    res.status(200).json({
+      token,
+      email: user.email,
+      userId: user._id,
+    });
   } catch (err) {
     res.status(500).json({ error: "Server error during login" });
   }
 };
+
 

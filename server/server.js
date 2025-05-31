@@ -13,6 +13,9 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/video", videoRoutes);
+const path = require("path");
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 
 mongoose
   .connect(process.env.MONGO_URI, {

@@ -7,11 +7,57 @@
     text-align: center;
     font-weight: bold;
     color: #fff;
-    font-size: 3rem;
-    
 }
 
 .color-primary {
     color: var(--color-primary);
     font-size: 3rem;
+}
+
+.header-left {
+    font-size: 3rem;
+    font-weight: bold;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 0 30px 0 0;
+}
+
+.user-email {
+    font-size: 0.95rem;
+    color: #ccc;
+}
+
+.logout-button {
+    padding: 6px 12px;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.logout-button:hover {
+    background-color: #741eaa;
+}
+
+.header-nav {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+
+.header-link {
+    text-decoration: none;
+    color: #fff;
+    font-weight: 500;
+}
+
+.header-link.active {
+    color: var(--color-primary);
 }

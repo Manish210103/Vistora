@@ -1,22 +1,23 @@
 const express = require("express");
 const router = express.Router();
+const upload = require("../middleware/upload");
 const authMiddleware = require("../middleware/authMiddleware");
-const {
-  uploadVideo,
-  getSummary,
-  getVideoStatus,
-} = require("../controllers/videoController");
+const videoController = require("../controllers/videoController");
 
-
-// Upload a new video (protected route)
-router.post("/upload", authMiddleware, uploadVideo);
-
-// Get generated summary clips and text for a video (protected)
-router.get("/summary/:videoId", authMiddleware, getSummary);
-
-// Check processing status of uploaded video (protected)
-router.get("/status/:videoId", authMiddleware, getVideoStatus);
-router.post("/upload", authMiddleware, uploadVideo);
-
+router.post(
+  "/upload",
+  authMiddleware,
+  upload.single("video"),
+  videoController.uploadVideo
+);
+router.get("/user/:userId", videoController.getUserVideos);
+router.get("/id/:id", videoController.getVideoById);
+router.delete("/:id", authMiddleware, videoController.deleteVideo);
+router.post("/analyze", videoController.analyzeVideo);
+router.patch(
+  "/update-summary",
+  authMiddleware,
+  videoController.updateVideoSummary
+);
 
 module.exports = router;

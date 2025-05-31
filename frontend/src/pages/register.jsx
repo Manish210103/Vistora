@@ -3,6 +3,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import registerImage from "../assets/register-bg.webp";
+import Notification from "../components/notification";
+import SpectrogramBackground from "../components/SpectrogramBackground";
 
 import "./Register.css";
 
@@ -11,19 +13,23 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const [notification, setNotification] = useState({ message: "", type: "" });
 
   const handleRegister = async () => {
     try {
       await axios.post("http://localhost:5000/api/auth/register", { email, password });
-      alert("Account created");
-      navigate("/login");
+      setNotification({ message: "Registration successful! Please login.", type: "success" });
+      setTimeout(() => {
+        navigate("/login");
+      }, 1000);
     } catch (err) {
-      alert(err.response?.data?.error || "Registration failed");
+      setNotification({ message: err.response?.data?.error || "Registration failed", type: "error" });
     }
   };
 
   return (
     <div className="register-container">
+      <SpectrogramBackground />
       <img className="register-image" src={registerImage} alt="Register Background" />
       <h2 className="register-title">Register</h2>
 
@@ -61,6 +67,11 @@ export default function Register() {
           Login
         </a>
       </p>
+      <Notification
+        message={notification.message}
+        type={notification.type}
+        onClose={() => setNotification({ message: "", type: "" })}
+      />
     </div>
   );
 }
