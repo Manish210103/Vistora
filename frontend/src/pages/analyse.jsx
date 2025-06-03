@@ -49,62 +49,43 @@ export default function Analyse() {
   useEffect(() => {
     if (!videoId || hasFetchedRef.current) return;
     hasFetchedRef.current = true;
-    console.log("videoId:", videoId);
     fetchVideoAnalysis();
   }, [videoId]);
 
   const segmentLineData = (summaryData?.segments ?? []).map((seg, idx) => {
-    const start = isNaN(seg.start) ? 0 : parseFloat(seg.start.toFixed(2));
-    const end = isNaN(seg.end) ? 0 : parseFloat(seg.end.toFixed(2));
-    const duration = isNaN(end - start) ? 0 : parseFloat((end - start).toFixed(2));
+    const safeStart = typeof seg.start === "number" && !isNaN(seg.start) ? seg.start : 0;
+    const safeEnd = typeof seg.end === "number" && !isNaN(seg.end) ? seg.end : 0;
+    const duration = Math.max(0, parseFloat((safeEnd - safeStart).toFixed(2)));
+  
     return {
       index: idx + 1,
-      start,
+      start: parseFloat(safeStart.toFixed(2)),
       duration,
       title: seg.title || "Untitled Segment",
     };
   });
+  
 
-  console.log("segmentLineData:", segmentLineData);
 
   const keywordFrequencyData = (summaryData?.keywords ?? []).map((kw) => ({
     name: kw.length > 15 ? `${kw.slice(0, 15)}...` : kw,
     value: 1,
   }));
 
-  const binSize = 5; 
-  const maxDuration = Math.max(...segmentLineData.map(d => d.duration), 15);
-  const bins = Array(Math.ceil(maxDuration / binSize)).fill(0).map((_, i) => ({
-    range: `${i * binSize}-${(i + 1) * binSize}s`,
-    count: segmentLineData.filter(d => d.duration >= i * binSize && d.duration < (i + 1) * binSize).length,
+  const clusterData = (summaryData?.segments ?? []).map((seg, idx) => ({
+    index: idx + 1,
+    duration: parseFloat((seg.end - seg.start).toFixed(2)),
+    cluster: seg.cluster,
+    title: seg.title,
+    x: seg.x,
+    y: seg.y,
   }));
+  
 
-  const clusterData = (summaryData?.segments ?? [])
-    .map((seg, idx) => {
-      const text = seg.text.toLowerCase();
-      let cluster = 0; 
-      if (text.includes("object-oriented") || text.includes("class")) cluster = 1;
-      else if (text.includes("compiler") || text.includes("memory")) cluster = 2;
-      return {
-        index: idx + 1,
-        duration: parseFloat((seg.end - seg.start).toFixed(2)),
-        cluster,
-        title: seg.title,
-      };
-    })
-    .sort((a, b) => a.index - b.index); 
+  const totalDuration = summaryData?.audioDuration ?? 0;
 
-  const totalDuration = summaryData?.segments?.length
-    ? summaryData.segments[summaryData.segments.length - 1].end
-    : 0;
-
-  const totalSummaryWords = (summaryData?.summaryPoints ?? []).reduce(
-    (sum, point) => sum + point.split(/\s+/).filter(word => word).length,
-    0
-  );
 
   const CustomTooltip = ({ active, payload, label }) => {
-    console.log("Tooltip triggered:", { active, payload, label });
     if (active && payload && payload.length > 0) {
       const data = payload[0].payload || {};
       return (
@@ -118,6 +99,35 @@ export default function Analyse() {
     }
     return null;
   };
+
+  const SentimentTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      const sentimentValue = payload[0].value;
+      const time = label;
+  
+      let sentimentLabel = "Neutral";
+      if (sentimentValue > 0.3) sentimentLabel = "Positive 😊";
+      else if (sentimentValue < -0.3) sentimentLabel = "Negative 😞";
+  
+      return (
+        <div
+          style={{
+            backgroundColor: "#000",
+            color: "#fff",
+            padding: "12px",
+            borderRadius: "12px",
+            zIndex: 1000,
+            outline: "none",
+          }}
+        >
+          <p><strong>Time:</strong> {time}s</p>
+          <p><strong>Sentiment:</strong> {sentimentLabel}</p>
+        </div>
+      );
+    }
+    return null;
+  };
+  
 
   const ClusterTooltip = ({ active, payload }) => {
     if (active && payload && payload.length > 0) {
@@ -167,8 +177,15 @@ export default function Analyse() {
               </p>
             </div>
             <div className="summary-box">
-              <h4>Total Summary Words</h4>
-              <p>{totalSummaryWords}</p>
+              <h4>Compression Ratio</h4>
+              <p>
+                {summaryData.transcriptWordCount
+                  ? `1 : ${Math.round(
+                    summaryData.transcriptWordCount /
+                    summaryData.summaryPoints.join(" ").split(" ").length
+                    )}`
+                  : "N/A"}
+              </p>
             </div>
           </div>
 
@@ -212,39 +229,61 @@ export default function Analyse() {
 
           <div className="chart-row">
           <div className="chart-small">
-              <h3>Segment Topic Clustering</h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <ScatterChart>
-                  <XAxis
-                    dataKey="index"
-                    type="number"
-                    domain={[1, segmentLineData.length]}
-                    label={{ value: "Segment Index", position: "insideBottom" }}
-                    allowDataOverflow
+            <h3>Semantic Clustering of Transcript Segments</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                <XAxis
+                  type="number"
+                  dataKey="x"
+                  name="X"
+                  label={{ value: "X", position: "insideBottom" }}
+                  domain={[0, 100]}
+                />
+                <YAxis
+                  type="number"
+                  dataKey="y"
+                  name="Y"
+                  label={{ value: "Y", angle: -90, position: "insideLeft" }}
+                  domain={[0, 100]}
+                />
+                <Tooltip
+                  content={<ClusterTooltip />}
+                  wrapperStyle={{
+                    zIndex: 1000,
+                    outline: "none",
+                    backgroundColor: "#000",
+                    padding: "12px",
+                    borderRadius: "12px",
+                  }}
+                />
+                {[...new Set(clusterData.map((d) => d.cluster))].map((clusterId, idx) => (
+                  <Scatter
+                    key={`cluster-${clusterId}`}
+                    name={`Cluster ${clusterId}`}
+                    data={clusterData.filter((d) => d.cluster === clusterId)}
+                    fill={CLUSTER_COLORS[idx % CLUSTER_COLORS.length]}
+                    shape="circle"
                   />
-                  <YAxis dataKey="duration" label={{ value: "Duration (s)", angle: -90, position: "insideLeft" }} />
-                  <Tooltip content={<ClusterTooltip />} wrapperStyle={{ zIndex: 1000, outline: "none",backgroundColor:"#000",padding:"12px",borderRadius:"12px"}}/>
-                  {CLUSTER_COLORS.map((color, i) => (
-                    <Scatter
-                      key={`cluster-${i}`}
-                      data={clusterData.filter(d => d.cluster === i)}
-                      fill={color}
-                      shape="circle"
-                    />
-                  ))}
-                </ScatterChart>
-              </ResponsiveContainer>
-            </div>
+                ))}
+              </ScatterChart>
+            </ResponsiveContainer>
+          </div>
 
             <div className="chart-large">
-              <h3>Segment Duration Distribution</h3>
+              <h3>Sentiment Over Time</h3>
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={bins}>
-                  <XAxis dataKey="range" label={{ value: "Duration Range (s)", position: "insideBottom" }} />
-                  <YAxis label={{ value: "Count", angle: -90, position: "insideLeft" }} />
-                  <Tooltip wrapperStyle={{ zIndex: 1000, outline: "none",backgroundColor:"#000",padding:"12px",borderRadius:"12px"}}/>
-                  <Bar dataKey="count" fill="#7209b7" isAnimationActive={false}/>
-                </BarChart>
+                <LineChart data={summaryData?.segments ?? []}>
+                  <XAxis dataKey="start" label={{ value: "Time (s)", position: "insideBottom" }} />
+                  <YAxis domain={[-1, 1]} label={{ value: "Sentiment", angle: -90, position: "insideLeft" }} />
+                  <Tooltip content={<SentimentTooltip />} />
+                  <Line
+                    type="monotone"
+                    dataKey="sentiment"
+                    stroke="#f72585"
+                    dot={{ r: 4 }}
+                    isAnimationActive={false}
+                  />
+                </LineChart>
               </ResponsiveContainer>
             </div>
 

@@ -135,13 +135,13 @@ export default function Upload() {
   return (
     <div className="upload-page">
       <div className="center-panel">
-        <div className="search-container">
+        {/* <div className="search-container">
           <input
             className="search-box"
             type="text"
             placeholder="Search video title, tags..."
           />
-        </div>
+        </div> */}
 
         {!video && !videoUrl ? (
           <label className="upload-box">

@@ -1,6 +1,5 @@
 import contextlib
 import os
-import sys
 
 def transcribe_audio(audio_path):
     import whisper

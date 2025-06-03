@@ -88,6 +88,8 @@ exports.analyzeVideo = async (req, res) => {
             keywords: result.keywords || [],
             segments: result.segments || [],
             isAnalyzed: true,
+            audioDuration: result.audio_duration || 0,
+            transcriptWordCount: result.transcript_word_count || 0,
           },
         });
       

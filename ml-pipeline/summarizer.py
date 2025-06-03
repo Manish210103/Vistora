@@ -37,12 +37,19 @@ class CleanSummarizer:
             scores[sent] = sum(word_freqs.get(w, 0) for w in words)
         return scores
 
-    def extract_keywords(self, text, keyword_count=5):
+    def extract_keywords(self, text, keyword_count=None):
         self.rake.extract_keywords_from_text(text)
-        ranked_phrases = self.rake.get_ranked_phrases()[:keyword_count]
-        return ranked_phrases
+        ranked_phrases = self.rake.get_ranked_phrases()
 
-    def summarize(self, text, keyword_count=5):
+        if keyword_count is None:
+            length_based_count = max(5, min(15, len(ranked_phrases) // 5))
+        else:
+            length_based_count = max(5, min(15, keyword_count)) 
+
+        return ranked_phrases[:length_based_count]
+
+
+    def summarize(self, text, keyword_count=None):
         sentences, words = self.preprocess(text)
         total_words = len(words)
         target_word_count = int(total_words * 4 / 5) 

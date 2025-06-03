@@ -56,7 +56,8 @@
 
 .upload-box {
     width: 580px;
-    height: 430px;
+    height: 460px;
+    margin-top: 2rem;
     border: 2px dashed #fff;
     border-radius: 12px;
     display: flex;
@@ -84,9 +85,10 @@
 }
 
 .preview-container {
+    margin-top: 4rem;
     position: relative;
     width: 580px;
-    height: 450px;
+    height: 400px;
     display: flex;
     justify-content: center;
     align-items: center;

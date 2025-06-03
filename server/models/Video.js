@@ -13,12 +13,18 @@ const videoSchema = new mongoose.Schema({
         start: Number,
         end: Number,
         text: String,
+        sentiment: Number,
+        cluster: Number,
+        x: Number,
+        y: Number,
       },
     ],
     default: [],
   },
   isAnalyzed: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
+  audioDuration: { type: Number, default: 0 },
+  transcriptWordCount: { type: Number, default: 0 },
 });
 
 module.exports = mongoose.model("Video", videoSchema);

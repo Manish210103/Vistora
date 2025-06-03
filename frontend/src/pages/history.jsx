@@ -7,6 +7,9 @@ import _ from "lodash";
 import history from "../assets/history.svg";
 import history1 from "../assets/history1.svg";
 import Notification from "../components/notification";
+import VideoPlayer from "../components/VideoPlayer";
+import { generatePDF } from "../utils/pdfGenerator";
+
 
 export default function History() {
   const [videos, setVideos] = useState([]);
@@ -228,17 +231,18 @@ export default function History() {
         {selectedVideoId && videoDetails ? (
           <div className="right-panel-inner">
             <div className="right-left">
-              <video
-                controls
-                className="full-video-player"
-                src={`http://localhost:5000/${videoDetails.videoPath}`}
-              />
+            <VideoPlayer
+              videoUrl={`http://localhost:5000/${videoDetails.videoPath}`}
+              segments={videoDetails.segments}
+            />
+
               <div className="video-info">
                 <h2>{_.capitalize(videoDetails.originalName || "Untitled Video")}</h2>
                 <p><strong>Uploaded at:</strong> {new Date(videoDetails.createdAt).toLocaleString()}</p>
                 <p><strong>Status:</strong> {videoDetails.isAnalyzed ? "Analyzed" : "Pending"}</p>
               </div>
             </div>
+
 
             <div className="right-right">
               <h2 className="right-title">Details</h2>
@@ -248,6 +252,12 @@ export default function History() {
                 title="Delete video"
               >
                 Delete
+              </button>
+              <button
+                className="download-btn"
+                onClick={() => generatePDF(videoDetails)}
+              >
+                Download PDF
               </button>
 
               <div className="right-content-scroll">

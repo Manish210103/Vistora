@@ -130,7 +130,7 @@
 
 .video-info h2 {
     margin: 0 0 0.25rem 0;
-    font-size: 1.5rem;
+    font-size: 1.25rem;
 }
 
 .right-right {
@@ -150,7 +150,8 @@
     margin: 0 0 0.5rem 0;
 }
 
-.delete-btn {
+.delete-btn,
+.download-btn {
     width: 80px;
     position: absolute;
     top: 10px;
@@ -161,6 +162,12 @@
     border-radius: 5px;
     cursor: pointer;
     font-weight: 600;
+}
+
+.download-btn{
+    top: 10px;
+    right: 100px;
+    width: 130px;
 }
 
 .delete-btn:hover {
@@ -331,7 +338,6 @@
     outline: none;
 }
 
-/* Firefox styles */
 .filter-popup input[type="range"]::-moz-range-track {
     height: 6px;
     background: #555;
