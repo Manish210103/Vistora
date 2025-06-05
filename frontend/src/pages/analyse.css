@@ -1,7 +1,7 @@
 .analyse-container {
     padding: 1rem 2rem 2rem;
     max-width: 100%;
-    height: 550px;
+    height: 85%;
     overflow-y: auto;
     scrollbar-width: none;
 }

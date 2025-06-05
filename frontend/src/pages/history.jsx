@@ -221,7 +221,6 @@ export default function History() {
                 </div>
               </div>
             ))}
-            {hasMore && <p className="loading-more">Loading more...</p>}
           </>
         )}
       </div>

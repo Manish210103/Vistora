@@ -6,6 +6,7 @@ from PIL import Image
 from rake_nltk import Rake
 import nltk
 from nltk.tokenize import sent_tokenize
+from summarizer import BartSummarizer
 
 nltk.download('stopwords')
 nltk.download('punkt')
@@ -63,17 +64,19 @@ def analyze_video_visually(video_path):
     unique_sentences = []
     seen = set()
     for sentence in cleaned:
-        if sentence.lower() not in seen and len(sentence.split()) > 3:
+        norm = sentence.lower()
+        if norm not in seen and len(sentence.split()) > 3:
             unique_sentences.append(sentence)
-            seen.add(sentence.lower())
+            seen.add(norm)
 
-    summary_points = unique_sentences[:max(5, min(20, len(unique_sentences)))]
+    full_text = " ".join(unique_sentences)
 
-    full_text = " ".join(summary_points)
-    keywords = clean_keywords(full_text)
+    summarizer = BartSummarizer()
+    result = summarizer.summarize(full_text)
 
     return {
-        "summary_points": summary_points,
-        "keywords": keywords[:15]
+        "summary_points": result["summary_points"],  
+        "keywords": result["keywords"][:15]          
     }
+
 

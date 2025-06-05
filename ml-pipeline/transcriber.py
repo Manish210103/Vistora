@@ -1,15 +1,16 @@
-import contextlib
-import os
+from faster_whisper import WhisperModel
 
 def transcribe_audio(audio_path):
-    import whisper
-    model = whisper.load_model("base")
-    with open(os.devnull, "w") as devnull:
-        with contextlib.redirect_stdout(devnull), contextlib.redirect_stderr(devnull):
-            result = model.transcribe(audio_path, verbose=False)
+    model = WhisperModel("base", device="cpu", compute_type="int8")
 
-    segments = [
-        {"start": segment["start"], "end": segment["end"], "text": segment["text"]}
-        for segment in result["segments"]
-    ]
-    return segments
+    segments, _ = model.transcribe(audio_path)
+
+    result = []
+    for segment in segments:
+        result.append({
+            "start": segment.start,
+            "end": segment.end,
+            "text": segment.text.strip()
+        })
+
+    return result

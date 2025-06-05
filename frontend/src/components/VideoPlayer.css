@@ -40,11 +40,11 @@
 }
 
 .time {
-    font-size: 14px;
+    font-size: 12px;
     width: 20%;
     text-align: center;
     background-color: var(--color-primary-dark);
-    padding: 13.5px 8px;
+    padding: 16px 8px;
     border-radius: 8px;
     color: #fff;
     margin-left: auto;
@@ -109,13 +109,19 @@
     transform: translateX(-50%);
     background: rgba(0, 0, 0, 0.75);
     color: white;
-    padding: 8px 14px;
+    padding: 10px 14px;
     font-size: 12px;
     border-radius: 8px;
     max-width: 90%;
     text-align: center;
     z-index: 2;
     white-space: pre-wrap;
+    height: 60px;
+    overflow-y: scroll;
+    scrollbar-width: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 .captions-btn{
     width: 15%;

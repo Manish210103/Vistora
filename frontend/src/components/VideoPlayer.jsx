@@ -12,7 +12,7 @@ export default function CustomVideoPlayer({ videoUrl, segments }) {
   const [duration, setDuration] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(1);
-  const [showCaptions, setShowCaptions] = useState(true); 
+  const [showCaptions, setShowCaptions] = useState(false); 
 
   const togglePlay = () => {
     const video = videoRef.current;

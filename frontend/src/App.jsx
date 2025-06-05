@@ -5,6 +5,7 @@ import Register from "./pages/register";
 import Upload from "./pages/upload";
 import History from "./pages/history";
 import Analyse from "./pages/analyse";
+import Info from "./pages/info"
 
 function App() {
   return (
@@ -35,6 +36,14 @@ function App() {
           element={
             <Layout>
               <Analyse />
+            </Layout>
+          }
+        />
+        <Route
+          path="/info"
+          element={
+            <Layout>
+              <Info />
             </Layout>
           }
         />

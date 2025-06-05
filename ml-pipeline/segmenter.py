@@ -65,28 +65,46 @@ class VideoSegmenter:
         segments = []
         current_segment = []
         current_start = None
+        current_end = None
         word_count = 0
-        seg_idx = 0
-        flat_segments = [(seg["text"], seg["start"], seg["end"]) for seg in transcript_segments]
+        
+        sentence_times = []
+        for seg in transcript_segments:
+            seg_sents = sent_tokenize(seg["text"])
+            seg_word_count = len(seg["text"].split())
+            seg_start = seg["start"]
+            seg_end = seg["end"]
+            seg_duration = seg_end - seg_start
+            if len(seg_sents) == 0:
+                continue
+            time_per_sent = seg_duration / len(seg_sents)
+            for i, sent in enumerate(seg_sents):
+                sent_start = seg_start + i * time_per_sent
+                sent_end = seg_start + (i + 1) * time_per_sent
+                sentence_times.append({"text": sent, "start": sent_start, "end": sent_end})
 
-        for i, sentence in enumerate(all_sentences):
-            words = sentence.split()
+        for i, sent_info in enumerate(sentence_times):
+            sent = sent_info["text"]
+            words = sent.split()
             if not words:
                 continue
-            if current_start is None and seg_idx < len(flat_segments):
-                current_start = flat_segments[seg_idx][1]
-            current_segment.append(sentence)
-            word_count += len(words)
 
-            is_last = (i == len(all_sentences) - 1)
+            if current_start is None:
+                current_start = sent_info["start"]
+
+            current_segment.append(sent)
+            word_count += len(words)
+            current_end = sent_info["end"]
+
+            is_last = (i == len(sentence_times) - 1)
+
             if word_count >= max_words_per_segment or is_last:
-                current_end = flat_segments[seg_idx][2] if seg_idx < len(flat_segments) else audio_duration
                 seg_text = " ".join(current_segment)
                 title = self.title_for_segment(seg_text)
                 sentiment = self.sentiment_for_segment(seg_text)
                 segments.append({
                     "title": title,
-                    "start": current_start if current_start is not None else 0,
+                    "start": current_start,
                     "end": current_end,
                     "text": seg_text,
                     "sentiment": sentiment
@@ -94,8 +112,7 @@ class VideoSegmenter:
                 current_segment = []
                 word_count = 0
                 current_start = None
-            if seg_idx < len(flat_segments) - 1:
-                seg_idx += 1
+                current_end = None
 
         segments = segments[:max_allowed_segments]
         return self.cluster_segments(segments)

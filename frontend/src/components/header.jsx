@@ -33,6 +33,7 @@ export default function Header() {
         <NavLink to="/upload" className="header-link" activeclassname="active">Upload</NavLink>
         <NavLink to="/history" className="header-link" activeclassname="active">History</NavLink>
         <NavLink to="/analyse" className="header-link" activeclassname="active">Visualise</NavLink>
+        <NavLink to="/info" className="header-link" activeclassname="active">Info</NavLink>
       </nav>
       <div className="header-right">
         {email && <span className="user-email">{email}</span>}

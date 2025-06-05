@@ -1,85 +1,70 @@
-import sys
-import nltk
-from nltk.tokenize import word_tokenize, sent_tokenize
-from nltk.corpus import stopwords
-import string
-from collections import Counter
+from transformers import BartTokenizer, BartForConditionalGeneration
+import torch
 from rake_nltk import Rake
+import nltk
+from nltk.corpus import stopwords
+import re
 
 nltk.download('punkt')
 nltk.download('stopwords')
 
-class CleanSummarizer:
+class BartSummarizer:
     def __init__(self):
+        self.tokenizer = BartTokenizer.from_pretrained("facebook/bart-large-cnn")
+        self.model = BartForConditionalGeneration.from_pretrained("facebook/bart-large-cnn")
+        self.rake = Rake()
         self.stopwords = set(stopwords.words('english'))
-        self.rake = Rake(stopwords=self.stopwords) 
 
-    def preprocess(self, text):
-        text = text.strip()
-        sentences = sent_tokenize(text)
-
-        text_no_punct = text.translate(str.maketrans('', '', string.punctuation))
-        words = word_tokenize(text_no_punct.lower())
-        words = [w for w in words if w.isalpha() and w not in self.stopwords]
-
-        return sentences, words
-
-    def get_word_frequencies(self, words):
-        freq = Counter(words)
-        max_freq = max(freq.values()) if freq else 1
-        return {word: count / max_freq for word, count in freq.items()}
-
-    def score_sentences(self, sentences, word_freqs):
-        scores = {}
-        for sent in sentences:
-            words = word_tokenize(sent.lower())
-            words = [w for w in words if w.isalpha() and w not in self.stopwords]
-            scores[sent] = sum(word_freqs.get(w, 0) for w in words)
-        return scores
-
-    def extract_keywords(self, text, keyword_count=None):
+    def extract_keywords(self, text, max_keywords=15):
         self.rake.extract_keywords_from_text(text)
         ranked_phrases = self.rake.get_ranked_phrases()
 
-        if keyword_count is None:
-            length_based_count = max(5, min(15, len(ranked_phrases) // 5))
-        else:
-            length_based_count = max(5, min(15, keyword_count)) 
+        keywords = []
+        for phrase in ranked_phrases:
+            words = phrase.split()
+            if 1 <= len(words) <= 3:
+                for w in words:
+                    w_lower = w.lower()
 
-        return ranked_phrases[:length_based_count]
+                    if (
+                        w_lower in self.stopwords
+                        or re.fullmatch(r'\d+', w_lower)  
+                        or len(w_lower) <= 2  
+                    ):
+                        continue
 
+                    if w_lower not in keywords:
+                        keywords.append(w_lower)
 
-    def summarize(self, text, keyword_count=None):
-        sentences, words = self.preprocess(text)
-        total_words = len(words)
-        target_word_count = int(total_words * 4 / 5) 
-
-        word_freqs = self.get_word_frequencies(words)
-        sentence_scores = self.score_sentences(sentences, word_freqs)
-
-        ranked_sentences = sorted(sentence_scores.items(), key=lambda kv: kv[1], reverse=True)
-
-        summary_points = []
-        summary_word_count = 0
-
-        for sent, score in ranked_sentences:
-            sent_word_count = len(word_tokenize(sent))
-            if summary_word_count + sent_word_count <= target_word_count or not summary_points:
-                summary_points.append(sent.strip())
-                summary_word_count += sent_word_count
-            else:
+            if len(keywords) >= max_keywords:
                 break
 
-        summary_points = sorted(summary_points, key=lambda s: sentences.index(s))
+        return keywords[:max_keywords]
 
-        top_keywords = self.extract_keywords(text, keyword_count)
+    def summarize(self, text):
+        inputs = self.tokenizer.encode(text, return_tensors="pt", truncation=True, max_length=1024)
+        input_len = inputs.shape[1]
+
+        max_length = max(60, min(1000, int(input_len * 0.75)))
+        min_length = max(30, int(max_length * 0.5))
+
+        summary_ids = self.model.generate(
+            inputs,
+            max_length=max_length,
+            min_length=min_length,
+            length_penalty=2.0,
+            num_beams=4,
+            early_stopping=True
+        )
+        summary = self.tokenizer.decode(summary_ids[0], skip_special_tokens=True)
+
+        keywords = self.extract_keywords(text, max_keywords=15)
 
         return {
-            "summary_points": summary_points,
-            "keywords": top_keywords
+            "summary_points": [summary], 
+            "keywords": keywords
         }
 
-
 def summarize_text(text):
-    summarizer = CleanSummarizer()
+    summarizer = BartSummarizer()
     return summarizer.summarize(text)
